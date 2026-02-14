@@ -8,7 +8,7 @@ An MCP (Model Context Protocol) server for AI-powered image generation and editi
 - **Image Editing** - Edit existing images with natural language instructions
 - **Reference Images** - Use reference images for style and content guidance
 - **Session Memory** - Continue editing the last image without re-specifying the path
-- **Configurable Model** - Choose any Gemini model (default: `gemini-2.5-flash-preview-04-17`)
+- **Configurable Model** - Choose any Gemini model (default: `gemini-2.5-flash`)
 - **Image History** - Track and browse recently generated/edited images
 - **Cross-Platform** - Works on macOS, Windows, and Linux
 
@@ -93,7 +93,7 @@ If installed from source, use the absolute path:
 
 ## Model Configuration
 
-The default model is `gemini-2.5-flash-preview-04-17`. You can change it in several ways:
+The default model is `gemini-2.5-flash`. You can change it in several ways:
 
 ### Option 1: Environment Variable
 
@@ -119,7 +119,7 @@ Set `GEMINI_MODEL` in your MCP client config:
 Use the `configure_model` tool to change the default model at runtime. The setting persists across sessions in `~/.nano-banana/config.json`.
 
 ```
-Set the model to gemini-2.5-pro-preview-05-06
+Set the model to gemini-2.5-pro
 ```
 
 ### Option 3: Per-Request Override
@@ -135,15 +135,15 @@ Generate an image of a cat using model gemini-2.0-flash-exp
 1. **Per-request `model` parameter** (highest priority)
 2. **`GEMINI_MODEL` environment variable**
 3. **Config file** (`~/.nano-banana/config.json`)
-4. **Default**: `gemini-2.5-flash-preview-04-17`
+4. **Default**: `gemini-2.5-flash`
 
 ### Available Models
 
 | Model | Description |
 |-------|-------------|
-| `gemini-2.5-flash-preview-04-17` | Default. Fast and capable. |
-| `gemini-2.5-pro-preview-05-06` | Higher quality, slower. |
-| `gemini-2.0-flash-exp` | Experimental, legacy support. |
+| `gemini-2.5-flash` | Default. Fast, stable, and capable. |
+| `gemini-2.5-pro` | Higher quality, slower. |
+| `gemini-2.0-flash-exp` | Legacy model (retiring March 2026). |
 
 > For the latest list of models that support image generation, see [Google AI documentation](https://ai.google.dev/gemini-api/docs/models).
 
@@ -232,7 +232,7 @@ npm run lint         # Run ESLint
 - **Runtime**: Node.js
 - **Language**: TypeScript (strict mode, ES2022)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **AI Model**: Google Gemini (configurable, default: `gemini-2.5-flash-preview-04-17`)
+- **AI Model**: Google Gemini (configurable, default: `gemini-2.5-flash`)
 - **Validation**: Zod
 
 ## License

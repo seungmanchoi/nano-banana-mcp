@@ -16,13 +16,13 @@ const TOOLS = [
   {
     name: 'configure_model',
     description:
-      'Set the default Gemini model for image generation and editing. Persists across sessions. Common models: gemini-2.5-flash-preview-04-17, gemini-2.0-flash-exp, gemini-2.5-pro-preview-05-06.',
+      'Set the default Gemini model for image generation and editing. Persists across sessions. Common models: gemini-2.5-flash, gemini-2.0-flash-exp, gemini-2.5-pro.',
     inputSchema: {
       type: 'object' as const,
       properties: {
         model: {
           type: 'string',
-          description: 'Gemini model ID to use (e.g. gemini-2.5-flash-preview-04-17)',
+          description: 'Gemini model ID to use (e.g. gemini-2.5-flash)',
         },
       },
       required: ['model'],
