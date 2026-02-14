@@ -1,0 +1,8 @@
+src/
+.env
+.env.example
+.eslintrc.json
+tsconfig.json
+.gitignore
+node_modules/
+.nano-banana/

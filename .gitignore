@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.env.local
+*.js.map
+*.d.ts.map
+.nano-banana/
+.DS_Store
