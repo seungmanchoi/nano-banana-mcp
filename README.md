@@ -21,7 +21,7 @@ Get your free API key from [Google AI Studio](https://aistudio.google.com/apikey
 ### 2. Install
 
 ```bash
-npm install -g gemini-nano-banana-mcp
+npm install -g @seungmanchoi/nano-banana-mcp
 ```
 
 Or install from source:
@@ -44,7 +44,7 @@ Add to `~/.claude/settings.json`:
   "mcpServers": {
     "nano-banana": {
       "command": "npx",
-      "args": ["-y", "gemini-nano-banana-mcp"],
+      "args": ["-y", "@seungmanchoi/nano-banana-mcp"],
       "env": {
         "GEMINI_API_KEY": "your-api-key-here"
       }
@@ -62,7 +62,7 @@ Add to your MCP settings:
   "mcpServers": {
     "nano-banana": {
       "command": "npx",
-      "args": ["-y", "gemini-nano-banana-mcp"],
+      "args": ["-y", "@seungmanchoi/nano-banana-mcp"],
       "env": {
         "GEMINI_API_KEY": "your-api-key-here"
       }
@@ -104,7 +104,7 @@ Set `GEMINI_MODEL` in your MCP client config:
   "mcpServers": {
     "nano-banana": {
       "command": "npx",
-      "args": ["-y", "gemini-nano-banana-mcp"],
+      "args": ["-y", "@seungmanchoi/nano-banana-mcp"],
       "env": {
         "GEMINI_API_KEY": "your-api-key-here",
         "GEMINI_MODEL": "gemini-2.0-flash-exp"

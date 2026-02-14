@@ -1,10 +1,10 @@
 {
-  "name": "gemini-nano-banana-mcp",
+  "name": "@seungmanchoi/nano-banana-mcp",
   "version": "1.0.0",
   "description": "MCP server for AI image generation and editing powered by Google Gemini",
   "main": "dist/index.js",
   "bin": {
-    "gemini-nano-banana-mcp": "dist/index.js"
+    "nano-banana-mcp": "dist/index.js"
   },
   "repository": {
     "type": "git",
