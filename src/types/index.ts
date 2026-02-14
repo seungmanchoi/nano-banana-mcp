@@ -1,5 +1,6 @@
 export interface IAppConfig {
   geminiApiKey: string;
+  model?: string;
 }
 
 export interface IImageRecord {

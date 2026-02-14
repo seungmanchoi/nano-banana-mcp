@@ -14,6 +14,21 @@ const TOOLS = [
     },
   },
   {
+    name: 'configure_model',
+    description:
+      'Set the default Gemini model for image generation and editing. Persists across sessions. Common models: gemini-2.5-flash-preview-04-17, gemini-2.0-flash-exp, gemini-2.5-pro-preview-05-06.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        model: {
+          type: 'string',
+          description: 'Gemini model ID to use (e.g. gemini-2.5-flash-preview-04-17)',
+        },
+      },
+      required: ['model'],
+    },
+  },
+  {
     name: 'generate_image',
     description: 'Generate a new image from a text description using Gemini AI. Returns the generated image and saves it to disk.',
     inputSchema: {
@@ -22,6 +37,10 @@ const TOOLS = [
         prompt: {
           type: 'string',
           description: 'Detailed description of the image to generate',
+        },
+        model: {
+          type: 'string',
+          description: 'Optional model override for this request (e.g. gemini-2.0-flash-exp)',
         },
       },
       required: ['prompt'],
@@ -46,6 +65,10 @@ const TOOLS = [
           items: { type: 'string' },
           description: 'Optional array of file paths to reference images for style or content guidance',
         },
+        model: {
+          type: 'string',
+          description: 'Optional model override for this request (e.g. gemini-2.0-flash-exp)',
+        },
       },
       required: ['imagePath', 'prompt'],
     },
@@ -65,13 +88,17 @@ const TOOLS = [
           items: { type: 'string' },
           description: 'Optional reference images for guidance',
         },
+        model: {
+          type: 'string',
+          description: 'Optional model override for this request',
+        },
       },
       required: ['prompt'],
     },
   },
   {
     name: 'get_status',
-    description: 'Check the current configuration status and last image information.',
+    description: 'Check the current configuration status, active model, and last image information.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

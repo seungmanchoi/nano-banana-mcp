@@ -1,6 +1,6 @@
 # Gemini Nano Banana MCP
 
-An MCP (Model Context Protocol) server for AI-powered image generation and editing using Google Gemini 2.0 Flash. Works with Claude Code, Cursor, and any MCP-compatible client.
+An MCP (Model Context Protocol) server for AI-powered image generation and editing using Google Gemini. Works with Claude Code, Cursor, and any MCP-compatible client.
 
 ## Features
 
@@ -8,6 +8,7 @@ An MCP (Model Context Protocol) server for AI-powered image generation and editi
 - **Image Editing** - Edit existing images with natural language instructions
 - **Reference Images** - Use reference images for style and content guidance
 - **Session Memory** - Continue editing the last image without re-specifying the path
+- **Configurable Model** - Choose any Gemini model (default: `gemini-2.5-flash-preview-04-17`)
 - **Image History** - Track and browse recently generated/edited images
 - **Cross-Platform** - Works on macOS, Windows, and Linux
 
@@ -90,15 +91,72 @@ If installed from source, use the absolute path:
 
 > You can also skip the `env` field and configure the API key at runtime using the `configure_api_key` tool.
 
+## Model Configuration
+
+The default model is `gemini-2.5-flash-preview-04-17`. You can change it in several ways:
+
+### Option 1: Environment Variable
+
+Set `GEMINI_MODEL` in your MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "npx",
+      "args": ["-y", "gemini-nano-banana-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "your-api-key-here",
+        "GEMINI_MODEL": "gemini-2.0-flash-exp"
+      }
+    }
+  }
+}
+```
+
+### Option 2: Runtime Tool
+
+Use the `configure_model` tool to change the default model at runtime. The setting persists across sessions in `~/.nano-banana/config.json`.
+
+```
+Set the model to gemini-2.5-pro-preview-05-06
+```
+
+### Option 3: Per-Request Override
+
+Pass the `model` parameter directly to `generate_image`, `edit_image`, or `continue_editing` to override the default for a single request:
+
+```
+Generate an image of a cat using model gemini-2.0-flash-exp
+```
+
+### Model Priority
+
+1. **Per-request `model` parameter** (highest priority)
+2. **`GEMINI_MODEL` environment variable**
+3. **Config file** (`~/.nano-banana/config.json`)
+4. **Default**: `gemini-2.5-flash-preview-04-17`
+
+### Available Models
+
+| Model | Description |
+|-------|-------------|
+| `gemini-2.5-flash-preview-04-17` | Default. Fast and capable. |
+| `gemini-2.5-pro-preview-05-06` | Higher quality, slower. |
+| `gemini-2.0-flash-exp` | Experimental, legacy support. |
+
+> For the latest list of models that support image generation, see [Google AI documentation](https://ai.google.dev/gemini-api/docs/models).
+
 ## Tools
 
 | Tool | Description |
 |------|-------------|
 | `configure_api_key` | Set or update the Gemini API key. Persists across sessions. |
-| `generate_image` | Generate a new image from a text description. |
-| `edit_image` | Edit an existing image with text instructions and optional reference images. |
-| `continue_editing` | Continue editing the last generated/edited image in the session. |
-| `get_status` | Check configuration status, output directory, and last image info. |
+| `configure_model` | Set the default Gemini model. Persists across sessions. |
+| `generate_image` | Generate a new image from a text description. Supports optional `model` override. |
+| `edit_image` | Edit an existing image with text instructions, optional reference images, and optional `model` override. |
+| `continue_editing` | Continue editing the last generated/edited image in the session. Supports optional `model` override. |
+| `get_status` | Check configuration status, active model, output directory, and last image info. |
 | `list_history` | List recently generated and edited images with prompts and timestamps. |
 
 ## Usage Examples
@@ -119,6 +177,10 @@ Continue editing - make the sky more vibrant with orange and pink tones
 
 ```
 Show me the last 5 images I generated
+```
+
+```
+Switch to gemini-2.5-pro model for higher quality
 ```
 
 ## API Key Configuration
@@ -145,7 +207,7 @@ src/
 ├── index.ts              # Entry point
 ├── server.ts             # MCP server setup and request routing
 ├── config/
-│   └── settings.ts       # API key management (env / file / runtime)
+│   └── settings.ts       # API key and model management
 ├── services/
 │   ├── gemini.ts         # Google Gemini API client
 │   └── storage.ts        # Image file I/O and history tracking
@@ -170,7 +232,7 @@ npm run lint         # Run ESLint
 - **Runtime**: Node.js
 - **Language**: TypeScript (strict mode, ES2022)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **AI Model**: Google Gemini 2.0 Flash (`gemini-2.0-flash-exp`)
+- **AI Model**: Google Gemini (configurable, default: `gemini-2.5-flash-preview-04-17`)
 - **Validation**: Zod
 
 ## License

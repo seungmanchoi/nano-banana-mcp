@@ -11,6 +11,7 @@ import { geminiService } from './services/gemini.js';
 import {
   TOOLS,
   handleConfigureApiKey,
+  handleConfigureModel,
   handleGenerateImage,
   handleEditImage,
   handleContinueEditing,
@@ -43,17 +44,20 @@ export class NanoBananaServer {
           case 'configure_api_key':
             return await handleConfigureApiKey(args as { apiKey: string });
 
+          case 'configure_model':
+            return await handleConfigureModel(args as { model: string });
+
           case 'generate_image':
-            return await handleGenerateImage(args as { prompt: string });
+            return await handleGenerateImage(args as { prompt: string; model?: string });
 
           case 'edit_image':
             return await handleEditImage(
-              args as { imagePath: string; prompt: string; referenceImages?: string[] },
+              args as { imagePath: string; prompt: string; referenceImages?: string[]; model?: string },
             );
 
           case 'continue_editing':
             return await handleContinueEditing(
-              args as { prompt: string; referenceImages?: string[] },
+              args as { prompt: string; referenceImages?: string[]; model?: string },
             );
 
           case 'get_status':
@@ -80,7 +84,7 @@ export class NanoBananaServer {
     const config = settingsManager.getConfig();
     if (config) {
       geminiService.configure(config.geminiApiKey);
-      console.error(`[nano-banana] Configured from ${settingsManager.getSource()}`);
+      console.error(`[nano-banana] Configured from ${settingsManager.getSource()}, model: ${settingsManager.getModel()}`);
     } else {
       console.error('[nano-banana] No API key found. Use configure_api_key tool to set one.');
     }

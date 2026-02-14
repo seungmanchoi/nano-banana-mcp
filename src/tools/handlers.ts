@@ -24,11 +24,21 @@ export async function handleConfigureApiKey(args: { apiKey: string }): Promise<C
   }
 }
 
-export async function handleGenerateImage(args: { prompt: string }): Promise<CallToolResult> {
+export async function handleConfigureModel(args: { model: string }): Promise<CallToolResult> {
+  try {
+    await settingsManager.setModel(args.model);
+    return textResponse(`Model set to: ${args.model}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Failed to configure model';
+    return textResponse(msg, true);
+  }
+}
+
+export async function handleGenerateImage(args: { prompt: string; model?: string }): Promise<CallToolResult> {
   ensureReady();
 
   try {
-    const result = await geminiService.generateImage(args.prompt);
+    const result = await geminiService.generateImage(args.prompt, args.model);
 
     if (result.savedPath) {
       lastImagePath = result.savedPath;
@@ -51,11 +61,12 @@ export async function handleEditImage(args: {
   imagePath: string;
   prompt: string;
   referenceImages?: string[];
+  model?: string;
 }): Promise<CallToolResult> {
   ensureReady();
 
   try {
-    const result = await geminiService.editImage(args.imagePath, args.prompt, args.referenceImages);
+    const result = await geminiService.editImage(args.imagePath, args.prompt, args.referenceImages, args.model);
 
     if (result.savedPath) {
       lastImagePath = result.savedPath;
@@ -77,6 +88,7 @@ export async function handleEditImage(args: {
 export async function handleContinueEditing(args: {
   prompt: string;
   referenceImages?: string[];
+  model?: string;
 }): Promise<CallToolResult> {
   if (!lastImagePath) {
     return textResponse(
@@ -89,17 +101,20 @@ export async function handleContinueEditing(args: {
     imagePath: lastImagePath,
     prompt: args.prompt,
     referenceImages: args.referenceImages,
+    model: args.model,
   });
 }
 
 export async function handleGetStatus(): Promise<CallToolResult> {
   const configStatus = settingsManager.getStatusMessage();
   const outputDir = storageService.getOutputDirectory();
+  const currentModel = settingsManager.getModel();
 
   const lines = [
     '=== Nano Banana MCP Status ===',
     '',
     `Configuration: ${configStatus}`,
+    `Model: ${currentModel}`,
     `Output directory: ${outputDir}`,
     `Last image: ${lastImagePath ?? 'None (no images in this session)'}`,
   ];

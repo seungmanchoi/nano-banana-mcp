@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { TextContent, ImageContent } from '@modelcontextprotocol/sdk/types.js';
+import { settingsManager } from '../config/index.js';
 import { storageService } from './storage.js';
 
 type TContentItem = TextContent | ImageContent;
@@ -29,13 +30,18 @@ class GeminiService {
     return this.client;
   }
 
-  async generateImage(prompt: string): Promise<IGeminiResult> {
+  private resolveModel(override?: string): string {
+    return override ?? settingsManager.getModel();
+  }
+
+  async generateImage(prompt: string, model?: string): Promise<IGeminiResult> {
     const client = this.ensureClient();
+    const resolvedModel = this.resolveModel(model);
     const contents: TContentItem[] = [];
     let savedPath: string | null = null;
 
     const response = await client.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: resolvedModel,
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
@@ -80,8 +86,10 @@ class GeminiService {
     imagePath: string,
     prompt: string,
     referenceImages?: string[],
+    model?: string,
   ): Promise<IGeminiResult> {
     const client = this.ensureClient();
+    const resolvedModel = this.resolveModel(model);
     const contents: TContentItem[] = [];
     let savedPath: string | null = null;
 
@@ -113,7 +121,7 @@ class GeminiService {
     inputParts.push({ text: prompt });
 
     const response = await client.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: resolvedModel,
       contents: [{ role: 'user', parts: inputParts }],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
