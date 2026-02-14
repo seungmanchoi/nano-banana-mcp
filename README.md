@@ -1,33 +1,78 @@
-# Nano Banana MCP
+# Gemini Nano Banana MCP
 
-Google Gemini AI를 활용한 이미지 생성 및 편집 MCP 서버입니다.
-Claude Code, Cursor 등 MCP 클라이언트에서 텍스트로 이미지를 생성하고 편집할 수 있습니다.
+An MCP (Model Context Protocol) server for AI-powered image generation and editing using Google Gemini 2.0 Flash. Works with Claude Code, Cursor, and any MCP-compatible client.
 
 ## Features
 
-- 텍스트 프롬프트로 이미지 생성
-- 기존 이미지 편집 (텍스트 지시)
-- 세션 메모리 기반 연속 편집
-- 참조 이미지를 활용한 스타일 가이드
-- 이미지 히스토리 관리
-- 크로스 플랫폼 지원 (macOS, Windows, Linux)
+- **Text-to-Image Generation** - Generate images from text prompts via Gemini AI
+- **Image Editing** - Edit existing images with natural language instructions
+- **Reference Images** - Use reference images for style and content guidance
+- **Session Memory** - Continue editing the last image without re-specifying the path
+- **Image History** - Track and browse recently generated/edited images
+- **Cross-Platform** - Works on macOS, Windows, and Linux
 
-## Setup
+## Quick Start
 
-### 1. Gemini API Key
+### 1. Get a Gemini API Key
 
-[Google AI Studio](https://aistudio.google.com/apikey)에서 API 키를 발급받으세요.
+Get your free API key from [Google AI Studio](https://aistudio.google.com/apikey).
 
-### 2. Install & Build
+### 2. Install
 
 ```bash
+npm install -g gemini-nano-banana-mcp
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/seungmanchoi/nano-banana-mcp.git
+cd nano-banana-mcp
 npm install
 npm run build
 ```
 
-### 3. Configure MCP Client
+### 3. Configure Your MCP Client
 
-**Claude Code** (`~/.claude/settings.json`):
+#### Claude Code
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "npx",
+      "args": ["-y", "gemini-nano-banana-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+#### Cursor
+
+Add to your MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "npx",
+      "args": ["-y", "gemini-nano-banana-mcp"],
+      "env": {
+        "GEMINI_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+#### From Source
+
+If installed from source, use the absolute path:
 
 ```json
 {
@@ -36,57 +81,97 @@ npm run build
       "command": "node",
       "args": ["/absolute/path/to/nano-banana-mcp/dist/index.js"],
       "env": {
-        "GEMINI_API_KEY": "your-api-key"
+        "GEMINI_API_KEY": "your-api-key-here"
       }
     }
   }
 }
 ```
 
-**환경변수 없이 사용하려면** MCP 서버 시작 후 `configure_api_key` 도구를 호출하세요.
+> You can also skip the `env` field and configure the API key at runtime using the `configure_api_key` tool.
 
 ## Tools
 
 | Tool | Description |
 |------|-------------|
-| `configure_api_key` | Gemini API 키 설정 |
-| `generate_image` | 텍스트로 새 이미지 생성 |
-| `edit_image` | 기존 이미지 편집 |
-| `continue_editing` | 마지막 이미지 연속 편집 |
-| `get_status` | 설정 상태 및 마지막 이미지 정보 |
-| `list_history` | 최근 생성/편집 이미지 히스토리 |
+| `configure_api_key` | Set or update the Gemini API key. Persists across sessions. |
+| `generate_image` | Generate a new image from a text description. |
+| `edit_image` | Edit an existing image with text instructions and optional reference images. |
+| `continue_editing` | Continue editing the last generated/edited image in the session. |
+| `get_status` | Check configuration status, output directory, and last image info. |
+| `list_history` | List recently generated and edited images with prompts and timestamps. |
 
-## Development
+## Usage Examples
 
-```bash
-npm run dev        # TypeScript 직접 실행
-npm run build      # 빌드
-npm run typecheck   # 타입 체크
-npm run lint       # ESLint
+Once the MCP server is connected, you can use natural language in your MCP client:
+
 ```
+Generate an image of a sunset over mountains with a lake reflection
+```
+
+```
+Edit the image at ~/nano-banana-images/gen_2025-01-01.png to add a boat on the lake
+```
+
+```
+Continue editing - make the sky more vibrant with orange and pink tones
+```
+
+```
+Show me the last 5 images I generated
+```
+
+## API Key Configuration
+
+The server loads the API key in the following priority order:
+
+1. **Environment variable** - `GEMINI_API_KEY`
+2. **Config file** - `~/.nano-banana/config.json`
+3. **Runtime** - via the `configure_api_key` tool
+
+## Image Storage
+
+Generated and edited images are automatically saved to:
+
+| Platform | Path |
+|----------|------|
+| macOS / Linux | `~/nano-banana-images/` |
+| Windows | `Documents\nano-banana-images\` |
 
 ## Project Structure
 
 ```
 src/
-├── index.ts           # Entry point
-├── server.ts          # MCP server class
+├── index.ts              # Entry point
+├── server.ts             # MCP server setup and request routing
 ├── config/
-│   └── settings.ts    # API key management
+│   └── settings.ts       # API key management (env / file / runtime)
 ├── services/
-│   ├── gemini.ts      # Gemini API integration
-│   └── storage.ts     # File I/O & history
+│   ├── gemini.ts         # Google Gemini API client
+│   └── storage.ts        # Image file I/O and history tracking
 ├── tools/
-│   ├── definitions.ts # Tool schemas
-│   └── handlers.ts    # Tool implementations
+│   ├── definitions.ts    # MCP tool schemas
+│   └── handlers.ts       # Tool request handlers
 └── types/
-    └── index.ts       # Type definitions
+    └── index.ts          # TypeScript type definitions
 ```
 
-## Image Storage
+## Development
 
-- **macOS/Linux**: `~/nano-banana-images/`
-- **Windows**: `Documents\nano-banana-images\`
+```bash
+npm run dev          # Run with tsx (no build needed)
+npm run build        # Compile TypeScript
+npm run typecheck    # Type check without emitting
+npm run lint         # Run ESLint
+```
+
+## Tech Stack
+
+- **Runtime**: Node.js
+- **Language**: TypeScript (strict mode, ES2022)
+- **MCP SDK**: `@modelcontextprotocol/sdk`
+- **AI Model**: Google Gemini 2.0 Flash (`gemini-2.0-flash-exp`)
+- **Validation**: Zod
 
 ## License
 

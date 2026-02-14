@@ -1,10 +1,18 @@
 {
-  "name": "nano-banana-mcp",
+  "name": "gemini-nano-banana-mcp",
   "version": "1.0.0",
   "description": "MCP server for AI image generation and editing powered by Google Gemini",
   "main": "dist/index.js",
   "bin": {
-    "nano-banana-mcp": "dist/index.js"
+    "gemini-nano-banana-mcp": "dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seungmanchoi/nano-banana-mcp.git"
+  },
+  "homepage": "https://github.com/seungmanchoi/nano-banana-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/seungmanchoi/nano-banana-mcp/issues"
   },
   "scripts": {
     "build": "tsc",
@@ -13,7 +21,8 @@
     "lint": "eslint src/ --ext .ts",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["mcp", "gemini", "image-generation", "ai", "claude"],
+  "files": ["dist", "README.md", "LICENSE"],
+  "keywords": ["mcp", "gemini", "image-generation", "image-editing", "ai", "claude", "google-gemini", "model-context-protocol"],
   "author": "blueng <blueng.choi@gmail.com>",
   "license": "MIT",
   "type": "module",
