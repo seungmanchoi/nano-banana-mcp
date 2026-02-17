@@ -16,7 +16,7 @@ const TOOLS = [
   {
     name: 'configure_model',
     description:
-      'Set the default Gemini model for image generation and editing. Persists across sessions. Common models: gemini-2.5-flash, gemini-2.0-flash-exp, gemini-2.5-pro.',
+      'Set the default Gemini model for image generation and editing. Persists across sessions. Recommended: gemini-2.5-flash-image (fast), gemini-3-pro-image-preview (best quality). Also available: gemini-2.5-flash, gemini-2.5-pro.',
     inputSchema: {
       type: 'object' as const,
       properties: {

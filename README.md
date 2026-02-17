@@ -142,8 +142,10 @@ Generate an image of a cat using model gemini-2.0-flash-exp
 | Model | Description |
 |-------|-------------|
 | `gemini-2.5-flash` | Default. Fast, stable, and capable. |
+| `gemini-2.5-flash-image` | Optimized for image generation. Fast, high-volume tasks. |
 | `gemini-2.5-pro` | Higher quality, slower. |
-| `gemini-2.0-flash-exp` | Legacy model (retiring March 2026). |
+| `gemini-3-pro-image-preview` | Best quality. Reasoning-enhanced composition, legible text rendering, up to 14 reference images. |
+| `gemini-2.0-flash-exp` | Legacy model (retiring March 31, 2026). |
 
 > For the latest list of models that support image generation, see [Google AI documentation](https://ai.google.dev/gemini-api/docs/models).
 
