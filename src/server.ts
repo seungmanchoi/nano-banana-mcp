@@ -15,16 +15,19 @@ import {
   handleGenerateImage,
   handleEditImage,
   handleContinueEditing,
+  handleGenerateVideo,
+  handleListVideoHistory,
   handleGetStatus,
   handleListHistory,
 } from './tools/index.js';
+import { IGenerateVideoParams } from './types/index.js';
 
 export class NanoBananaServer {
   private server: Server;
 
   constructor() {
     this.server = new Server(
-      { name: 'nano-banana-mcp', version: '1.0.0' },
+      { name: 'nano-banana-mcp', version: '1.1.0' },
       { capabilities: { tools: {} } },
     );
 
@@ -59,6 +62,12 @@ export class NanoBananaServer {
             return await handleContinueEditing(
               args as { prompt: string; referenceImages?: string[]; model?: string },
             );
+
+          case 'generate_video':
+            return await handleGenerateVideo(args as unknown as IGenerateVideoParams);
+
+          case 'list_video_history':
+            return await handleListVideoHistory(args as { count?: number });
 
           case 'get_status':
             return await handleGetStatus();

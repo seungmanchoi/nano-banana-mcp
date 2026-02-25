@@ -97,8 +97,70 @@ const TOOLS = [
     },
   },
   {
+    name: 'generate_video',
+    description:
+      'Generate a video from a text prompt using Gemini Veo. Supports text-to-video, image-to-video (first frame), and first+last frame interpolation. Video generation takes 1-6 minutes. Available models: veo-3.1-generate-preview (latest), veo-3-generate-preview, veo-2-generate-preview.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        prompt: {
+          type: 'string',
+          description: 'Detailed description of the video to generate. Include subject, action, style, camera movement, and atmosphere.',
+        },
+        model: {
+          type: 'string',
+          description:
+            'Veo model to use. Options: veo-3.1-generate-preview (default, latest), veo-3-generate-preview, veo-2-generate-preview.',
+        },
+        imagePath: {
+          type: 'string',
+          description: 'Optional: Absolute file path to an image to use as the first frame (image-to-video generation).',
+        },
+        lastFramePath: {
+          type: 'string',
+          description:
+            'Optional: Absolute file path to an image to use as the last frame (first+last frame interpolation). Requires imagePath to be set.',
+        },
+        aspectRatio: {
+          type: 'string',
+          description: 'Aspect ratio of the video. Options: "16:9" (default, landscape), "9:16" (portrait).',
+        },
+        resolution: {
+          type: 'string',
+          description: 'Video resolution. Options: "720p" (default), "1080p", "4k".',
+        },
+        durationSeconds: {
+          type: 'number',
+          description: 'Video duration in seconds. Options: 4, 6, 8 (default varies by model).',
+        },
+        numberOfVideos: {
+          type: 'number',
+          description: 'Number of video variants to generate (default: 1).',
+        },
+        negativePrompt: {
+          type: 'string',
+          description: 'Optional: Elements to avoid in the generated video.',
+        },
+      },
+      required: ['prompt'],
+    },
+  },
+  {
+    name: 'list_video_history',
+    description: 'List recently generated videos with their prompts, models, and timestamps.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        count: {
+          type: 'number',
+          description: 'Number of recent videos to show (default: 10, max: 50)',
+        },
+      },
+    },
+  },
+  {
     name: 'get_status',
-    description: 'Check the current configuration status, active model, and last image information.',
+    description: 'Check the current configuration status, active model, and last image/video information.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

@@ -5,6 +5,8 @@ export {
   handleGenerateImage,
   handleEditImage,
   handleContinueEditing,
+  handleGenerateVideo,
+  handleListVideoHistory,
   handleGetStatus,
   handleListHistory,
 } from './handlers.js';

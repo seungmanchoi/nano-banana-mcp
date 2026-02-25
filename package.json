@@ -1,7 +1,7 @@
 {
   "name": "@seungmanchoi/nano-banana-mcp",
-  "version": "1.0.2",
-  "description": "MCP server for AI image generation and editing powered by Google Gemini",
+  "version": "1.1.0",
+  "description": "MCP server for AI image generation, editing, and video generation powered by Google Gemini and Veo",
   "main": "dist/index.js",
   "bin": {
     "nano-banana-mcp": "dist/index.js"
@@ -62,7 +62,16 @@
     "design",
     "illustration",
     "png",
-    "artwork"
+    "artwork",
+    "video-generation",
+    "text-to-video",
+    "image-to-video",
+    "veo",
+    "veo-3",
+    "veo-3.1",
+    "ai-video",
+    "video",
+    "mp4"
   ],
   "author": "blueng <blueng.choi@gmail.com>",
   "license": "MIT",

@@ -1,10 +1,12 @@
 import { mkdir, writeFile, readFile, stat, access } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import { homedir, platform } from 'node:os';
-import { IImageRecord, TMimeType } from '../types/index.js';
+import { IImageRecord, IVideoRecord, TMimeType } from '../types/index.js';
 
 const FOLDER_NAME = 'nano-banana-images';
+const VIDEO_FOLDER_NAME = 'nano-banana-videos';
 const HISTORY_FILE = '.nano-banana-history.json';
+const VIDEO_HISTORY_FILE = '.nano-banana-video-history.json';
 
 function resolveOutputDir(): string {
   const os = platform();
@@ -15,10 +17,25 @@ function resolveOutputDir(): string {
   return join(homedir(), FOLDER_NAME);
 }
 
+function resolveVideoOutputDir(): string {
+  const os = platform();
+  if (os === 'win32') {
+    const docs = join(homedir(), 'Documents');
+    return join(docs, VIDEO_FOLDER_NAME);
+  }
+  return join(homedir(), VIDEO_FOLDER_NAME);
+}
+
 function buildFileName(prefix: string): string {
   const ts = new Date().toISOString().replace(/[:.]/g, '-');
   const rand = Math.random().toString(36).substring(2, 8);
   return `${prefix}_${ts}_${rand}.png`;
+}
+
+function buildVideoFileName(prefix: string): string {
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const rand = Math.random().toString(36).substring(2, 8);
+  return `${prefix}_${ts}_${rand}.mp4`;
 }
 
 function detectMimeType(filePath: string): TMimeType {
@@ -44,15 +61,23 @@ async function fileExists(filePath: string): Promise<boolean> {
 
 class StorageService {
   private outputDir: string;
+  private videoOutputDir: string;
   private historyPath: string;
+  private videoHistoryPath: string;
 
   constructor() {
     this.outputDir = resolveOutputDir();
+    this.videoOutputDir = resolveVideoOutputDir();
     this.historyPath = join(this.outputDir, HISTORY_FILE);
+    this.videoHistoryPath = join(this.videoOutputDir, VIDEO_HISTORY_FILE);
   }
 
   async initialize(): Promise<void> {
     await mkdir(this.outputDir, { recursive: true });
+  }
+
+  async initializeVideo(): Promise<void> {
+    await mkdir(this.videoOutputDir, { recursive: true });
   }
 
   async saveImage(base64Data: string, prefix: 'gen' | 'edit'): Promise<string> {
@@ -62,6 +87,10 @@ class StorageService {
     const buffer = Buffer.from(base64Data, 'base64');
     await writeFile(filePath, buffer);
     return filePath;
+  }
+
+  getVideoFilePath(prefix: 'video' | 'extend'): string {
+    return join(this.videoOutputDir, buildVideoFileName(prefix));
   }
 
   async readImageAsBase64(filePath: string): Promise<string> {
@@ -88,12 +117,23 @@ class StorageService {
     };
   }
 
+  async getVideoInfo(filePath: string): Promise<{ size: number; modified: string } | null> {
+    return this.getImageInfo(filePath);
+  }
+
   async appendHistory(record: IImageRecord): Promise<void> {
     const history = await this.loadHistory();
     history.push(record);
-    // 최근 50개만 유지
     const trimmed = history.slice(-50);
     await writeFile(this.historyPath, JSON.stringify(trimmed, null, 2));
+  }
+
+  async appendVideoHistory(record: IVideoRecord): Promise<void> {
+    await this.initializeVideo();
+    const history = await this.loadVideoHistory();
+    history.push(record);
+    const trimmed = history.slice(-50);
+    await writeFile(this.videoHistoryPath, JSON.stringify(trimmed, null, 2));
   }
 
   async loadHistory(): Promise<IImageRecord[]> {
@@ -108,13 +148,34 @@ class StorageService {
     }
   }
 
+  async loadVideoHistory(): Promise<IVideoRecord[]> {
+    const exists = await fileExists(this.videoHistoryPath);
+    if (!exists) return [];
+
+    try {
+      const raw = await readFile(this.videoHistoryPath, 'utf-8');
+      return JSON.parse(raw) as IVideoRecord[];
+    } catch {
+      return [];
+    }
+  }
+
   async listRecentImages(count: number = 10): Promise<IImageRecord[]> {
     const history = await this.loadHistory();
     return history.slice(-count).reverse();
   }
 
+  async listRecentVideos(count: number = 10): Promise<IVideoRecord[]> {
+    const history = await this.loadVideoHistory();
+    return history.slice(-count).reverse();
+  }
+
   getOutputDirectory(): string {
     return this.outputDir;
+  }
+
+  getVideoOutputDirectory(): string {
+    return this.videoOutputDir;
   }
 }
 
