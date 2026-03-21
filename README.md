@@ -98,7 +98,7 @@ If installed from source, use the absolute path:
 
 ### Image Models
 
-The default image model is `gemini-2.5-flash`. You can change it in several ways:
+The default image model is `gemini-2.0-flash-preview-image-generation`. You can change it in several ways:
 
 #### Option 1: Environment Variable
 
@@ -112,7 +112,7 @@ Set `GEMINI_MODEL` in your MCP client config:
       "args": ["-y", "@seungmanchoi/nano-banana-mcp"],
       "env": {
         "GEMINI_API_KEY": "your-api-key-here",
-        "GEMINI_MODEL": "gemini-2.0-flash-exp"
+        "GEMINI_MODEL": "gemini-2.0-flash-preview-image-generation"
       }
     }
   }
@@ -124,7 +124,7 @@ Set `GEMINI_MODEL` in your MCP client config:
 Use the `configure_model` tool to change the default model at runtime. The setting persists across sessions in `~/.nano-banana/config.json`.
 
 ```
-Set the model to gemini-2.5-pro
+Set the model to imagen-3.0-generate-002
 ```
 
 #### Option 3: Per-Request Override
@@ -132,7 +132,7 @@ Set the model to gemini-2.5-pro
 Pass the `model` parameter directly to `generate_image`, `edit_image`, or `continue_editing` to override the default for a single request:
 
 ```
-Generate an image of a cat using model gemini-2.0-flash-exp
+Generate an image of a cat using model imagen-3.0-generate-002
 ```
 
 ### Model Priority
@@ -140,17 +140,17 @@ Generate an image of a cat using model gemini-2.0-flash-exp
 1. **Per-request `model` parameter** (highest priority)
 2. **`GEMINI_MODEL` environment variable**
 3. **Config file** (`~/.nano-banana/config.json`)
-4. **Default**: `gemini-2.5-flash`
+4. **Default**: `gemini-2.0-flash-preview-image-generation`
 
 ### Available Image Models
 
-| Model | Description |
-|-------|-------------|
-| `gemini-2.5-flash` | Default. Fast, stable, and capable. |
-| `gemini-2.5-flash-image` | Optimized for image generation. Fast, high-volume tasks. |
-| `gemini-2.5-pro` | Higher quality, slower. |
-| `gemini-3-pro-image-preview` | Best quality. Reasoning-enhanced composition, legible text rendering, up to 14 reference images. |
-| `gemini-2.0-flash-exp` | Legacy model (retiring March 31, 2026). |
+| Model | Tier | Description |
+|-------|------|-------------|
+| `gemini-2.0-flash-preview-image-generation` | **Free** | Default. Native image generation via Gemini 2.0 Flash. |
+| `imagen-3.0-generate-002` | Paid | Best quality. Google's dedicated image generation model. |
+| `imagen-3.0-fast-generate-001` | Paid | Fast variant of Imagen 3, optimized for speed. |
+
+> **Note**: Free-tier API keys support `gemini-2.0-flash-preview-image-generation`. Imagen models require billing enabled on your Google Cloud project.
 
 ### Available Video Models
 
@@ -247,7 +247,7 @@ Check the current status
 ```
 
 ```
-Switch to gemini-2.5-pro model for higher quality
+Switch to imagen-3.0-generate-002 model for higher quality
 ```
 
 ## Video Generation Details
