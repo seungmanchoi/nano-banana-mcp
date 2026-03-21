@@ -1,6 +1,6 @@
 {
   "name": "@seungmanchoi/nano-banana-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MCP server for AI image generation, editing, and video generation powered by Google Gemini and Veo",
   "main": "dist/index.js",
   "bin": {

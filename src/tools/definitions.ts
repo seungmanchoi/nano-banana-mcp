@@ -16,13 +16,13 @@ const TOOLS = [
   {
     name: 'configure_model',
     description:
-      'Set the default Gemini model for image generation and editing. Persists across sessions. Recommended: gemini-2.5-flash-image (fast), gemini-3-pro-image-preview (best quality). Also available: gemini-2.5-flash, gemini-2.5-pro.',
+      'Set the default Gemini model for image generation and editing. Persists across sessions. Recommended: gemini-2.0-flash-preview-image-generation (default, free tier). Also available: imagen-3.0-generate-002 (best quality, requires billing), imagen-3.0-fast-generate-001 (fast, requires billing).',
     inputSchema: {
       type: 'object' as const,
       properties: {
         model: {
           type: 'string',
-          description: 'Gemini model ID to use (e.g. gemini-2.5-flash)',
+          description: 'Gemini model ID to use (e.g. gemini-2.0-flash-preview-image-generation)',
         },
       },
       required: ['model'],
@@ -40,7 +40,7 @@ const TOOLS = [
         },
         model: {
           type: 'string',
-          description: 'Optional model override for this request (e.g. gemini-2.0-flash-exp)',
+          description: 'Optional model override for this request (e.g. gemini-2.0-flash-preview-image-generation)',
         },
       },
       required: ['prompt'],
@@ -67,7 +67,7 @@ const TOOLS = [
         },
         model: {
           type: 'string',
-          description: 'Optional model override for this request (e.g. gemini-2.0-flash-exp)',
+          description: 'Optional model override for this request (e.g. gemini-2.0-flash-preview-image-generation)',
         },
       },
       required: ['imagePath', 'prompt'],

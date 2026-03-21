@@ -18,11 +18,16 @@ interface IVideoResult {
 const DEFAULT_VIDEO_MODEL = 'veo-3.1-generate-preview';
 const VIDEO_POLL_INTERVAL_MS = 10_000;
 
+// Image generation models require v1alpha endpoint
+const IMAGE_API_VERSION = 'v1alpha';
+
 class GeminiService {
   private client: GoogleGenAI | null = null;
+  private imageClient: GoogleGenAI | null = null;
 
   configure(apiKey: string): void {
     this.client = new GoogleGenAI({ apiKey });
+    this.imageClient = new GoogleGenAI({ apiKey, apiVersion: IMAGE_API_VERSION });
   }
 
   isConfigured(): boolean {
@@ -38,6 +43,15 @@ class GeminiService {
     return this.client;
   }
 
+  private ensureImageClient(): GoogleGenAI {
+    if (!this.imageClient) {
+      throw new Error(
+        'Gemini API is not configured. Use configure_api_key tool first or set GEMINI_API_KEY environment variable.',
+      );
+    }
+    return this.imageClient;
+  }
+
   private resolveModel(override?: string): string {
     return override ?? settingsManager.getModel();
   }
@@ -47,7 +61,7 @@ class GeminiService {
   }
 
   async generateImage(prompt: string, model?: string): Promise<IGeminiResult> {
-    const client = this.ensureClient();
+    const client = this.ensureImageClient();
     const resolvedModel = this.resolveModel(model);
     const contents: TContentItem[] = [];
     let savedPath: string | null = null;
@@ -100,7 +114,7 @@ class GeminiService {
     referenceImages?: string[],
     model?: string,
   ): Promise<IGeminiResult> {
-    const client = this.ensureClient();
+    const client = this.ensureImageClient();
     const resolvedModel = this.resolveModel(model);
     const contents: TContentItem[] = [];
     let savedPath: string | null = null;

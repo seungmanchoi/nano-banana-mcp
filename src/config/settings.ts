@@ -7,7 +7,7 @@ import { IAppConfig } from '../types/index.js';
 const CONFIG_DIR = join(homedir(), '.nano-banana');
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
 
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+const DEFAULT_MODEL = 'gemini-2.0-flash-preview-image-generation';
 
 const configSchema = z.object({
   geminiApiKey: z.string().min(1, 'API key cannot be empty'),
