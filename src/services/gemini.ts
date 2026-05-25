@@ -52,17 +52,19 @@ class GeminiService {
     return this.imageClient;
   }
 
-  private resolveModel(override?: string): string {
-    return override ?? settingsManager.getModel();
+  private resolveModel(override?: string, quality?: string): string {
+    if (override) return override;
+    if (quality === 'fast') return settingsManager.getFastModel();
+    return settingsManager.getModel();
   }
 
   private resolveVideoModel(override?: string): string {
     return override ?? DEFAULT_VIDEO_MODEL;
   }
 
-  async generateImage(prompt: string, model?: string): Promise<IGeminiResult> {
+  async generateImage(prompt: string, model?: string, quality?: string): Promise<IGeminiResult> {
     const client = this.ensureImageClient();
-    const resolvedModel = this.resolveModel(model);
+    const resolvedModel = this.resolveModel(model, quality);
     const contents: TContentItem[] = [];
     let savedPath: string | null = null;
 
@@ -113,9 +115,10 @@ class GeminiService {
     prompt: string,
     referenceImages?: string[],
     model?: string,
+    quality?: string,
   ): Promise<IGeminiResult> {
     const client = this.ensureImageClient();
-    const resolvedModel = this.resolveModel(model);
+    const resolvedModel = this.resolveModel(model, quality);
     const contents: TContentItem[] = [];
     let savedPath: string | null = null;
 

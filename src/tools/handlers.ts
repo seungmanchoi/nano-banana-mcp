@@ -25,8 +25,12 @@ export async function handleConfigureApiKey(args: { apiKey: string }): Promise<C
   }
 }
 
-export async function handleConfigureModel(args: { model: string }): Promise<CallToolResult> {
+export async function handleConfigureModel(args: { model: string; quality?: string }): Promise<CallToolResult> {
   try {
+    if (args.quality === 'fast') {
+      await settingsManager.setFastModel(args.model);
+      return textResponse(`Fast model set to: ${args.model}`);
+    }
     await settingsManager.setModel(args.model);
     return textResponse(`Model set to: ${args.model}`);
   } catch (err) {
@@ -35,11 +39,11 @@ export async function handleConfigureModel(args: { model: string }): Promise<Cal
   }
 }
 
-export async function handleGenerateImage(args: { prompt: string; model?: string }): Promise<CallToolResult> {
+export async function handleGenerateImage(args: { prompt: string; model?: string; quality?: string }): Promise<CallToolResult> {
   ensureReady();
 
   try {
-    const result = await geminiService.generateImage(args.prompt, args.model);
+    const result = await geminiService.generateImage(args.prompt, args.model, args.quality);
 
     if (result.savedPath) {
       lastImagePath = result.savedPath;
@@ -63,11 +67,12 @@ export async function handleEditImage(args: {
   prompt: string;
   referenceImages?: string[];
   model?: string;
+  quality?: string;
 }): Promise<CallToolResult> {
   ensureReady();
 
   try {
-    const result = await geminiService.editImage(args.imagePath, args.prompt, args.referenceImages, args.model);
+    const result = await geminiService.editImage(args.imagePath, args.prompt, args.referenceImages, args.model, args.quality);
 
     if (result.savedPath) {
       lastImagePath = result.savedPath;
@@ -90,6 +95,7 @@ export async function handleContinueEditing(args: {
   prompt: string;
   referenceImages?: string[];
   model?: string;
+  quality?: string;
 }): Promise<CallToolResult> {
   if (!lastImagePath) {
     return textResponse(
@@ -103,6 +109,7 @@ export async function handleContinueEditing(args: {
     prompt: args.prompt,
     referenceImages: args.referenceImages,
     model: args.model,
+    quality: args.quality,
   });
 }
 
@@ -169,7 +176,8 @@ export async function handleGetStatus(): Promise<CallToolResult> {
     '=== Nano Banana MCP Status ===',
     '',
     `Configuration: ${configStatus}`,
-    `Image Model: ${currentModel}`,
+    `Image Model (high): ${currentModel}`,
+    `Image Model (fast): ${settingsManager.getFastModel()}`,
     `Video Model: veo-3.1-generate-preview (default)`,
     `Image output directory: ${outputDir}`,
     `Video output directory: ${videoOutputDir}`,

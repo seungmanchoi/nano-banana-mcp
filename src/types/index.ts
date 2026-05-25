@@ -1,7 +1,10 @@
 export interface IAppConfig {
   geminiApiKey: string;
   model?: string;
+  fastModel?: string;
 }
+
+export type TQuality = 'high' | 'fast';
 
 export interface IImageRecord {
   filePath: string;

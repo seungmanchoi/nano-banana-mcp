@@ -48,19 +48,19 @@ export class NanoBananaServer {
             return await handleConfigureApiKey(args as { apiKey: string });
 
           case 'configure_model':
-            return await handleConfigureModel(args as { model: string });
+            return await handleConfigureModel(args as { model: string; quality?: string });
 
           case 'generate_image':
-            return await handleGenerateImage(args as { prompt: string; model?: string });
+            return await handleGenerateImage(args as { prompt: string; model?: string; quality?: string });
 
           case 'edit_image':
             return await handleEditImage(
-              args as { imagePath: string; prompt: string; referenceImages?: string[]; model?: string },
+              args as { imagePath: string; prompt: string; referenceImages?: string[]; model?: string; quality?: string },
             );
 
           case 'continue_editing':
             return await handleContinueEditing(
-              args as { prompt: string; referenceImages?: string[]; model?: string },
+              args as { prompt: string; referenceImages?: string[]; model?: string; quality?: string },
             );
 
           case 'generate_video':

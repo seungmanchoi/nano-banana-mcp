@@ -16,13 +16,18 @@ const TOOLS = [
   {
     name: 'configure_model',
     description:
-      'Set the default Gemini model for image generation and editing. Persists across sessions. Recommended: gemini-2.0-flash-preview-image-generation (default, free tier). Also available: imagen-3.0-generate-002 (best quality, requires billing), imagen-3.0-fast-generate-001 (fast, requires billing).',
+      'Set the default Gemini model for image generation and editing. Persists across sessions. Use "quality" param to set either "high" (default) or "fast" model tier. High-quality: gemini-3.1-flash-image-preview (default). Fast/cheap: gemini-2.5-flash-image (default fast).',
     inputSchema: {
       type: 'object' as const,
       properties: {
         model: {
           type: 'string',
-          description: 'Gemini model ID to use (e.g. gemini-2.0-flash-preview-image-generation)',
+          description: 'Gemini model ID to use',
+        },
+        quality: {
+          type: 'string',
+          enum: ['high', 'fast'],
+          description: 'Which model tier to set: "high" (default, best quality) or "fast" (cheaper/faster). Defaults to "high".',
         },
       },
       required: ['model'],
@@ -40,7 +45,12 @@ const TOOLS = [
         },
         model: {
           type: 'string',
-          description: 'Optional model override for this request (e.g. gemini-2.0-flash-preview-image-generation)',
+          description: 'Optional model override for this request',
+        },
+        quality: {
+          type: 'string',
+          enum: ['high', 'fast'],
+          description: 'Model tier: "high" (best quality, default) or "fast" (cheaper/faster)',
         },
       },
       required: ['prompt'],
@@ -67,7 +77,12 @@ const TOOLS = [
         },
         model: {
           type: 'string',
-          description: 'Optional model override for this request (e.g. gemini-2.0-flash-preview-image-generation)',
+          description: 'Optional model override for this request',
+        },
+        quality: {
+          type: 'string',
+          enum: ['high', 'fast'],
+          description: 'Model tier: "high" (best quality, default) or "fast" (cheaper/faster)',
         },
       },
       required: ['imagePath', 'prompt'],
@@ -91,6 +106,11 @@ const TOOLS = [
         model: {
           type: 'string',
           description: 'Optional model override for this request',
+        },
+        quality: {
+          type: 'string',
+          enum: ['high', 'fast'],
+          description: 'Model tier: "high" (best quality, default) or "fast" (cheaper/faster)',
         },
       },
       required: ['prompt'],
