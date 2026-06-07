@@ -1,19 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
-import { TextContent, ImageContent } from '@modelcontextprotocol/sdk/types.js';
 import { settingsManager } from '../config/index.js';
 import { storageService } from './storage.js';
+import { TContentItem, IGeminiResult } from '../types/index.js';
 
-type TContentItem = TextContent | ImageContent;
-
-interface IGeminiResult {
-  contents: TContentItem[];
-  savedPath: string | null;
-}
-
-interface IVideoResult {
-  contents: TContentItem[];
-  savedPath: string | null;
-}
+type IVideoResult = IGeminiResult;
 
 const DEFAULT_VIDEO_MODEL = 'veo-3.1-generate-preview';
 const VIDEO_POLL_INTERVAL_MS = 10_000;

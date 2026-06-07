@@ -8,9 +8,11 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { settingsManager } from './config/index.js';
 import { geminiService } from './services/gemini.js';
+import { geminiWebClient } from './services/gemini-web.js';
 import {
   TOOLS,
   handleConfigureApiKey,
+  handleConfigureGoogleLogin,
   handleConfigureModel,
   handleGenerateImage,
   handleEditImage,
@@ -46,6 +48,11 @@ export class NanoBananaServer {
         switch (name) {
           case 'configure_api_key':
             return await handleConfigureApiKey(args as { apiKey: string });
+
+          case 'configure_google_login':
+            return await handleConfigureGoogleLogin(
+              args as { secure1psid: string; secure1psidts?: string },
+            );
 
           case 'configure_model':
             return await handleConfigureModel(args as { model: string; quality?: string });
@@ -91,11 +98,22 @@ export class NanoBananaServer {
     await settingsManager.load();
 
     const config = settingsManager.getConfig();
-    if (config) {
-      geminiService.configure(config.geminiApiKey);
-      console.error(`[nano-banana] Configured from ${settingsManager.getSource()}, model: ${settingsManager.getModel()}`);
+    if (config && settingsManager.isReady()) {
+      if (config.authMode === 'gemini-web' && config.cookies) {
+        geminiWebClient.configure(config.cookies);
+        console.error(
+          `[nano-banana] Configured gemini-web mode (free/unofficial) from ${settingsManager.getSource()}`,
+        );
+      } else if (config.geminiApiKey) {
+        geminiService.configure(config.geminiApiKey);
+        console.error(
+          `[nano-banana] Configured apiKey mode from ${settingsManager.getSource()}, model: ${settingsManager.getModel()}`,
+        );
+      }
     } else {
-      console.error('[nano-banana] No API key found. Use configure_api_key tool to set one.');
+      console.error(
+        '[nano-banana] Not configured. Use configure_api_key (API key) or configure_google_login (free Google cookies).',
+      );
     }
 
     const transport = new StdioServerTransport();

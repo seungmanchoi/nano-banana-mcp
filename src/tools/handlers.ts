@@ -1,8 +1,9 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { settingsManager } from '../config/index.js';
 import { geminiService } from '../services/gemini.js';
+import { geminiWebClient } from '../services/gemini-web.js';
 import { storageService } from '../services/storage.js';
-import { IImageRecord, IVideoRecord, IGenerateVideoParams } from '../types/index.js';
+import { IImageRecord, IVideoRecord, IGenerateVideoParams, IGeminiResult, IGoogleCookies } from '../types/index.js';
 
 let lastImagePath: string | null = null;
 let lastVideoPath: string | null = null;
@@ -18,9 +19,36 @@ export async function handleConfigureApiKey(args: { apiKey: string }): Promise<C
   try {
     await settingsManager.setApiKey(args.apiKey);
     geminiService.configure(args.apiKey);
-    return textResponse('API key configured successfully. You can now generate and edit images and videos.');
+    return textResponse(
+      'API 키(apiKey 모드)가 설정되었습니다. 이제 이미지·영상 생성/편집을 사용할 수 있습니다.',
+    );
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Failed to configure API key';
+    return textResponse(msg, true);
+  }
+}
+
+export async function handleConfigureGoogleLogin(args: {
+  secure1psid: string;
+  secure1psidts?: string;
+}): Promise<CallToolResult> {
+  try {
+    const secure1psid = args.secure1psid?.trim();
+    if (!secure1psid) {
+      return textResponse('__Secure-1PSID 쿠키 값이 필요합니다.', true);
+    }
+    const cookies: IGoogleCookies = {
+      secure1psid,
+      secure1psidts: args.secure1psidts?.trim() || undefined,
+    };
+    await settingsManager.setCookies(cookies);
+    geminiWebClient.configure(cookies);
+    return textResponse(
+      'Google 쿠키(무료/비공식 gemini-web 모드)가 설정되었습니다. 이제 generate_image / edit_image를 사용할 수 있습니다. ' +
+        '(영상 생성은 API 키 모드 전용입니다. configure_api_key로 되돌릴 수 있습니다.)',
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Failed to configure Google login';
     return textResponse(msg, true);
   }
 }
@@ -43,7 +71,10 @@ export async function handleGenerateImage(args: { prompt: string; model?: string
   ensureReady();
 
   try {
-    const result = await geminiService.generateImage(args.prompt, args.model, args.quality);
+    const result: IGeminiResult =
+      settingsManager.getAuthMode() === 'gemini-web'
+        ? await geminiWebClient.generateImage(args.prompt)
+        : await geminiService.generateImage(args.prompt, args.model, args.quality);
 
     if (result.savedPath) {
       lastImagePath = result.savedPath;
@@ -72,7 +103,10 @@ export async function handleEditImage(args: {
   ensureReady();
 
   try {
-    const result = await geminiService.editImage(args.imagePath, args.prompt, args.referenceImages, args.model, args.quality);
+    const result: IGeminiResult =
+      settingsManager.getAuthMode() === 'gemini-web'
+        ? await geminiWebClient.editImage(args.imagePath, args.prompt, args.referenceImages)
+        : await geminiService.editImage(args.imagePath, args.prompt, args.referenceImages, args.model, args.quality);
 
     if (result.savedPath) {
       lastImagePath = result.savedPath;
@@ -114,6 +148,12 @@ export async function handleContinueEditing(args: {
 }
 
 export async function handleGenerateVideo(args: IGenerateVideoParams): Promise<CallToolResult> {
+  if (settingsManager.getAuthMode() === 'gemini-web') {
+    return textResponse(
+      '영상 생성은 API 키 모드에서만 지원됩니다. configure_api_key로 Gemini API 키를 설정한 뒤 다시 시도하세요.',
+      true,
+    );
+  }
   ensureReady();
 
   try {
@@ -170,20 +210,31 @@ export async function handleGetStatus(): Promise<CallToolResult> {
   const configStatus = settingsManager.getStatusMessage();
   const outputDir = storageService.getOutputDirectory();
   const videoOutputDir = storageService.getVideoOutputDirectory();
-  const currentModel = settingsManager.getModel();
+  const authMode = settingsManager.getAuthMode();
+  const isWeb = authMode === 'gemini-web';
 
   const lines = [
     '=== Nano Banana MCP Status ===',
     '',
+    `Auth mode: ${authMode}${isWeb ? ' (free / unofficial consumer Gemini)' : ''}`,
     `Configuration: ${configStatus}`,
-    `Image Model (high): ${currentModel}`,
-    `Image Model (fast): ${settingsManager.getFastModel()}`,
-    `Video Model: veo-3.1-generate-preview (default)`,
+  ];
+
+  if (isWeb) {
+    lines.push('Image generation/editing: via consumer Gemini web (model fixed by your account)');
+    lines.push('Video generation: unavailable in gemini-web mode (use apiKey mode)');
+  } else {
+    lines.push(`Image Model (high): ${settingsManager.getModel()}`);
+    lines.push(`Image Model (fast): ${settingsManager.getFastModel()}`);
+    lines.push('Video Model: veo-3.1-generate-preview (default)');
+  }
+
+  lines.push(
     `Image output directory: ${outputDir}`,
     `Video output directory: ${videoOutputDir}`,
     `Last image: ${lastImagePath ?? 'None (no images in this session)'}`,
     `Last video: ${lastVideoPath ?? 'None (no videos in this session)'}`,
-  ];
+  );
 
   if (lastImagePath) {
     const info = await storageService.getImageInfo(lastImagePath);
@@ -226,7 +277,11 @@ export async function handleListHistory(args: { count?: number }): Promise<CallT
 }
 
 function ensureReady(): void {
-  if (!geminiService.isConfigured()) {
+  const ready =
+    settingsManager.getAuthMode() === 'gemini-web'
+      ? geminiWebClient.isConfigured()
+      : geminiService.isConfigured();
+  if (!ready) {
     throw new Error(settingsManager.getStatusMessage());
   }
 }

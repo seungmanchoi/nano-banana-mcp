@@ -94,6 +94,60 @@ If installed from source, use the absolute path:
 
 > You can also skip the `env` field and configure the API key at runtime using the `configure_api_key` tool.
 
+## Authentication Modes
+
+This server supports two authentication modes. The default is **API key mode** (above).
+
+### Mode A — API key (official, default)
+
+Uses a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey).
+Supports image generation, image editing, **and video (Veo)**. Note that image
+generation models are largely a paid feature.
+
+### Mode B — Free Google-cookie mode (consumer Gemini, **unofficial**)
+
+Drives your logged-in [gemini.google.com](https://gemini.google.com) session via its
+session cookies instead of an API key. **Free**, and supports **image generation +
+editing only** (no video).
+
+> ⚠️ **This mode is unofficial.** It talks to an undocumented internal endpoint, not the
+> official API. It may break when Google changes things, cookies expire periodically and
+> must be re-extracted, and use is a Terms-of-Service gray area. Intended for personal use
+> with your own account.
+
+**1. Extract your cookies** from a browser where you're logged into gemini.google.com:
+
+1. Open `https://gemini.google.com` and sign in.
+2. DevTools (F12) → **Application** → **Cookies** → `https://gemini.google.com`.
+3. Copy the value of `__Secure-1PSID` (required) and `__Secure-1PSIDTS` (recommended).
+
+**2a. Configure via environment variables:**
+
+```json
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "npx",
+      "args": ["-y", "@seungmanchoi/nano-banana-mcp"],
+      "env": {
+        "GEMINI_AUTH_MODE": "gemini-web",
+        "GEMINI_SECURE_1PSID": "your-__Secure-1PSID-value",
+        "GEMINI_SECURE_1PSIDTS": "your-__Secure-1PSIDTS-value"
+      }
+    }
+  }
+}
+```
+
+**2b. Or configure at runtime** with the `configure_google_login` tool:
+
+```
+Use configure_google_login with secure1psid "<...>" and secure1psidts "<...>"
+```
+
+This switches the active mode to `gemini-web` and persists to `~/.nano-banana/config.json`.
+Run `configure_api_key` again at any time to switch back to API key mode.
+
 ## Model Configuration
 
 ### Image Models
@@ -168,8 +222,9 @@ Generate an image of a cat using model imagen-3.0-generate-002
 
 | Tool | Description |
 |------|-------------|
-| `configure_api_key` | Set or update the Gemini API key. Persists across sessions. |
-| `configure_model` | Set the default Gemini model for images. Persists across sessions. |
+| `configure_api_key` | Set or update the Gemini API key (switches to apiKey mode). Persists across sessions. |
+| `configure_google_login` | Switch to free, unofficial `gemini-web` mode using consumer Gemini cookies (`secure1psid`, optional `secure1psidts`). Image generation + editing only. |
+| `configure_model` | Set the default Gemini model for images (apiKey mode). Persists across sessions. |
 | `generate_image` | Generate a new image from a text description. Supports optional `model` override. |
 | `edit_image` | Edit an existing image with text instructions, optional reference images, and optional `model` override. |
 | `continue_editing` | Continue editing the last generated/edited image in the session. Supports optional `model` override. |

@@ -14,6 +14,25 @@ const TOOLS = [
     },
   },
   {
+    name: 'configure_google_login',
+    description:
+      'Switch to the free, unofficial "gemini-web" auth mode that uses your logged-in consumer Gemini (gemini.google.com) session instead of an API key. Supports image generation and editing (no video). Extract the cookies from your browser DevTools (Application > Cookies > gemini.google.com). Cookies are stored locally and may need re-extraction when they expire.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        secure1psid: {
+          type: 'string',
+          description: 'The __Secure-1PSID cookie value from gemini.google.com (required)',
+        },
+        secure1psidts: {
+          type: 'string',
+          description: 'The __Secure-1PSIDTS cookie value (recommended; improves session stability)',
+        },
+      },
+      required: ['secure1psid'],
+    },
+  },
+  {
     name: 'configure_model',
     description:
       'Set the default Gemini model for image generation and editing. Persists across sessions. Use "quality" param to set either "high" (default) or "fast" model tier. High-quality: gemini-3.1-flash-image-preview (default). Fast/cheap: gemini-2.5-flash-image (default fast).',

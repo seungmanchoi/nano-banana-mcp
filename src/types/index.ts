@@ -1,5 +1,16 @@
+import { TextContent, ImageContent } from '@modelcontextprotocol/sdk/types.js';
+
+export type TAuthMode = 'apiKey' | 'gemini-web';
+
+export interface IGoogleCookies {
+  secure1psid: string;
+  secure1psidts?: string;
+}
+
 export interface IAppConfig {
-  geminiApiKey: string;
+  authMode: TAuthMode;
+  geminiApiKey?: string;
+  cookies?: IGoogleCookies;
   model?: string;
   fastModel?: string;
 }
@@ -61,3 +72,10 @@ export interface IExtendVideoParams {
 
 export type TMimeType = 'image/png' | 'image/jpeg' | 'image/webp' | 'image/gif';
 export type TVideoMimeType = 'video/mp4';
+
+export type TContentItem = TextContent | ImageContent;
+
+export interface IGeminiResult {
+  contents: TContentItem[];
+  savedPath: string | null;
+}
